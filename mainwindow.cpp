@@ -13,8 +13,11 @@ MainWindow::MainWindow(QWidget *parent) :
     currentGauge = new currentGague(this);
     top_layout->addWidget(currentGauge->widget);
     top_box->setLayout(top_layout);
+    top_box->setTitle("Gauges");
     this->setCentralWidget(top_box );
     this->show();
+
+    // ******** For testing purpose ***************
 
     struct I_t I ={1.0f , 0.0f};
     while(1){

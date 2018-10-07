@@ -8,7 +8,9 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
 
     // Widget
         widget = new QcGaugeWidget(parent);
-        widget->setFixedSize(200,200);
+        widget->setMinimumWidth(125);
+        widget->setMinimumHeight(125);
+
     // Background
         bkg = widget -> addBackground(97 , DegreeStart , DegreeEnd);
         bkg->clearrColors();
@@ -16,6 +18,20 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
         bkg_center = widget -> addBackground(5 , 0 , 360);
         bkg_center->clearrColors();
         bkg_center->addColor(0 , Qt::black);
+
+        // Arc
+        widget->addArc(98)->setDgereeRange(DegreeStart , DegreeEnd);
+
+        // Color Band
+        ColorBand = widget->addColorBand(95);
+        QList<QPair<QColor,float>> BandColors;
+        for(int i=0; i< 4 ; i++){
+            BandColors.append(pair[i]);
+        }
+        ColorBand->setColors(BandColors);
+        ColorBand->setDgereeRange(DegreeStart , DegreeEnd);
+
+
     // Labels
         label = widget->addLabel(20);
         label->setText(label_str);
@@ -39,10 +55,10 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
         ms_needle.Item->setDgereeRange(DegreeStart , DegreeEnd);
 
     // Degree Items
-        DegreeItem =    widget->addDegrees(93);
+        DegreeItem =    widget->addDegrees(92.5);
         DegreeItem->    setDgereeRange(DegreeStart , DegreeEnd);
         DegreeItem->    setSubDegree(false);
-        DegreeSubItem = widget->addDegrees(95);
+        DegreeSubItem = widget->addDegrees(93);
         DegreeSubItem-> setDgereeRange(DegreeStart , DegreeEnd);
         DegreeSubItem-> setSubDegree(true);
 
@@ -52,17 +68,6 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
         Values->setMinValue(0);
         Values->setMaxValue(Imax);
 
-    // Arc
-        widget->addArc(97)->setDgereeRange(DegreeStart , DegreeEnd);
-
-    // Color Band
-        ColorBand = widget->addColorBand(92);
-        QList<QPair<QColor,float>> BandColors;
-        for(int i=0; i< 4 ; i++){
-            BandColors.append(pair[i]);
-         }
-        ColorBand->setColors(BandColors);
-        ColorBand->setDgereeRange(DegreeStart , DegreeEnd);
 
         setScale(Imax);
 

@@ -37,12 +37,12 @@ private:
     QcDegreesItem* DegreeItem;
     int DegreeStart = 0;
     int DegreeEnd =   180;
-    QPair<QColor,float> pair[4]={{Qt::green , 15},{Qt::darkGreen , 65},{Qt::yellow , 80},{Qt::red , 100}};
+    QPair<QColor,float> pair[4]={{Qt::green , 20},{Qt::darkGreen , 70},{Qt::yellow , 80},{Qt::red , 100}};
     QcColorBand* ColorBand;
     QcLabelItem* label;
     const QString label_str = "CoilCurrent [A]";
     float Imax;
-    float scale_overcurrent=1.25f; // How much larger is the scale compared to Imax;
+    float scale_overcurrent=100.0f/pair[2].second; // How much larger is the scale compared to Imax;
 
 };
 
