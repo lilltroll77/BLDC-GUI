@@ -30,7 +30,9 @@ private:
     QList<QPair<QColor,float>> BandColors;
     QcColorBand* ColorBand;
     QcLabelItem* label;
-    const QString label_str = "Temp. [C°]";
+    QcLabelItem* temp_label;
+    const QString label_str = "Temperature";
+    int bkg_colorstate=0;
 
 };
 

@@ -33,8 +33,10 @@ tempgauge::tempgauge(QWidget *parent) : QWidget(parent)
 
 
     //labels
-        label = widget->addLabel(65);
+        label = widget->addLabel(70);
         label->setText(label_str);
+        temp_label =  widget->addLabel(40);
+        temp_label->setColor(Qt::black);
 
     //needle
         needle = widget->addNeedle(85);
@@ -52,6 +54,7 @@ tempgauge::tempgauge(QWidget *parent) : QWidget(parent)
         Values->setMinValue(temp_colorregions[0]);
         Values->setMaxValue(temp_colorregions[4]);
         widget->addArc(97)->setDgereeRange(0,360);
+        //widget->addGlass(100);
 
 }
 float tempgauge::temp2percent(float T){
@@ -60,4 +63,19 @@ float tempgauge::temp2percent(float T){
 
 void tempgauge::setTemp(float T){
     needle->setCurrentValue(temp2percent(T));
+    temp_label->setText(QString("%1 C°").arg(T , 0 , 'f' , 1));
+    if(T < temp_colorregions[3]){
+        if(bkg_colorstate){
+            temp_label->setColor( Qt::black);
+            bkg->clearrColors();
+            bkg->addColor(0 , Qt::white);
+            bkg_colorstate=0;
+        }
+    }else if(!bkg_colorstate){
+        temp_label->setColor( color[3]);
+        bkg->clearrColors();
+        bkg->addColor(0 , QColor(255,225,225));
+        bkg_colorstate=1;
+    }
 }
+
