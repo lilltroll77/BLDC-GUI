@@ -12,7 +12,7 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
         widget->setMinimumHeight(125);
 
     // Background
-        bkg = widget -> addBackground(97 , DegreeStart , DegreeEnd);
+        bkg = widget -> addBackground(98 , DegreeStart , DegreeEnd);
         bkg->clearrColors();
         bkg->addColor(0 , Qt::white);
         bkg_center = widget -> addBackground(5 , 0 , 360);
@@ -67,8 +67,6 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
         Values->setDgereeRange(DegreeStart , DegreeEnd);
         Values->setMinValue(0);
         Values->setMaxValue(Imax);
-
-
         setScale(Imax);
 
 }

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtWidgets>
 #include "currentgague.h"
+#include "tempgauge.h"
 
 extern void wait( int millisecondsToWait );
 
@@ -24,6 +25,7 @@ private:
     QGridLayout* top_layout;
     QGroupBox* top_box;
     currentGague* currentGauge;
+    tempgauge* tempGauge;
 
 };
 
