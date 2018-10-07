@@ -7,24 +7,24 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setWindowTitle("FOC & SVPWM for BLDC with XMOS");
-    QMenuBar* menuBar = new QMenuBar(this);
-    QMenu FileMenu;
+    top_layout = new QGridLayout(this);
+    top_box = new QGroupBox(this);
 
-    FileMenu.addSection("File");
-    FileMenu.addSection("Help");
-    FileMenu.set
-
-    menuBar->addMenu(&FileMenu);
-
-    setMenuBar(menuBar);
     currentGauge = new currentGague(this);
-    top_layout.addWidget(currentGauge,2,2,1,1);
-    top_layout.setAlignment(currentGauge , Qt::AlignBottom);
-    top_layout.setSpacing(5);
-    //this->setLayout(&top_layout);
-    //setCentralWidget(currentGauge);
-    this->setLayout(&top_layout);
-    //this->update();
+    top_layout->addWidget(currentGauge->widget);
+    top_box->setLayout(top_layout);
+    this->setCentralWidget(top_box );
+    this->show();
+
+    struct I_t I ={1.0f , 0.0f};
+    while(1){
+        wait(16);
+        I.peak = fmodf(I.peak+0.1f , 25.0f);
+        I.ms = fmodf(I.ms+0.1f , 25.0f);
+        currentGauge->setCurrent(&I);
+
+
+    }
 
 }
 

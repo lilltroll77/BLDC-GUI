@@ -26,7 +26,8 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     currentgague.cpp \
-    qcgaugewidget.cpp
+    qcgaugewidget.cpp \
+    wait.cpp
 
 HEADERS += \
         mainwindow.h \

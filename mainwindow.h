@@ -5,6 +5,8 @@
 #include <QtWidgets>
 #include "currentgague.h"
 
+extern void wait( int millisecondsToWait );
+
 namespace Ui {
 class MainWindow;
 }
@@ -19,7 +21,8 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    QGridLayout top_layout;
+    QGridLayout* top_layout;
+    QGroupBox* top_box;
     currentGague* currentGauge;
 
 };

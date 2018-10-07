@@ -1,8 +1,10 @@
 #include "currentgague.h"
 
 
-currentGague::currentGague(QWidget *parent , float Imax) : QWidget(parent)
+currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
 {
+
+    Imax = imax;
 
     // Widget
         widget = new QcGaugeWidget(parent);
@@ -62,4 +64,34 @@ currentGague::currentGague(QWidget *parent , float Imax) : QWidget(parent)
         ColorBand->setColors(BandColors);
         ColorBand->setDgereeRange(DegreeStart , DegreeEnd);
 
+        setScale(Imax);
+
+}
+
+void currentGague::setScale(float I){
+    Imax = I;
+    float Imax_scale =scale_overcurrent*I;
+    Values->setMaxValue(Imax_scale);
+    if(Imax_scale>10){
+        Values->setStep(5);
+        DegreeSubItem->setStep(100/Imax_scale);
+        DegreeItem->setStep(500/Imax_scale);
+    }else if(I<1){
+        Values->setStep(0.1f);
+        DegreeSubItem->setStep(2/Imax_scale);
+        DegreeItem->setStep(10/Imax_scale);
+   }else if(I<3){
+        Values->setStep(0.5f);
+        DegreeSubItem->setStep(10/Imax_scale);
+        DegreeItem->setStep(50/Imax_scale);
+    }else{
+        Values->setStep(1);
+        DegreeSubItem->setStep(20/Imax_scale);
+        DegreeItem->setStep(100/Imax_scale);
+    }
+}
+
+void currentGague::setCurrent(struct I_t *I){
+    peak_needle.Item->setCurrentValue(I->peak * (100/(scale_overcurrent*Imax)));
+    ms_needle.Item  ->setCurrentValue(I->ms * (100/(scale_overcurrent*Imax)));
 }

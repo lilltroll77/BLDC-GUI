@@ -9,19 +9,25 @@ struct needle_t{
    QcNeedleItem* Item;
 };
 
+struct I_t{
+    float peak;
+    float ms; //Mean square
+};
+
 class currentGague : public QWidget
 {
     Q_OBJECT
 public:
-    explicit currentGague(QWidget *parent = nullptr, float Imax=32.0f);
-
+    explicit currentGague(QWidget *parent = nullptr, float imax=25.0f);
+    QcGaugeWidget* widget;
 signals:
 
 public slots:
+    void setCurrent(struct I_t *I);
+    void setScale(float I);
 
 
 private:
-    QcGaugeWidget* widget;
     QcBackgroundItem *bkg;
     QcBackgroundItem *bkg_center;
     needle_t peak_needle;
@@ -35,10 +41,8 @@ private:
     QcColorBand* ColorBand;
     QcLabelItem* label;
     const QString label_str = "CoilCurrent [A]";
-    //QcNeedleItem* peak_needle;
-    //QcLabelItem* peak_needle_label;
-    //QcNeedleItem* ms_needle;
-    //QcLabelItem* ms_needle_label;
+    float Imax;
+    float scale_overcurrent=1.25f; // How much larger is the scale compared to Imax;
 
 };
 
