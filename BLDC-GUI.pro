@@ -29,14 +29,16 @@ SOURCES += \
     qcgaugewidget.cpp \
     wait.cpp \
     tempgauge.cpp \
-    QEgauge.cpp
+    QEgauge.cpp \
+    tachometer.cpp
 
 HEADERS += \
         mainwindow.h \
     currentgague.h \
     qcgaugewidget.h \
     tempgauge.h \
-    QEgauge.h
+    QEgauge.h \
+    tachometer.h
 
 FORMS += \
         mainwindow.ui

@@ -6,6 +6,7 @@
 #include "currentgague.h"
 #include "tempgauge.h"
 #include "QEgauge.h"
+#include "tachometer.h"
 
 extern void wait( int millisecondsToWait );
 
@@ -28,6 +29,7 @@ private:
     currentGague* currentGauge;
     tempgauge* tempGauge;
     QEgauge* angleGauge;
+    tachometer* tachometerGauge;
     QStatusBar* statusbar;
 
 };
