@@ -28,6 +28,7 @@ private:
     currentGague* currentGauge;
     tempgauge* tempGauge;
     QEgauge* angleGauge;
+    QStatusBar* statusbar;
 
 };
 

@@ -13,12 +13,15 @@ MainWindow::MainWindow(QWidget *parent) :
     currentGauge = new currentGague(this);
     tempGauge = new tempgauge(this);
     angleGauge = new QEgauge(this);
+    statusbar = new QStatusBar(this);
+    statusbar->showMessage("Serial: Not connected");
     top_layout->addWidget(currentGauge->widget , 1,1);
     top_layout->addWidget(tempGauge->widget , 2,1);
     top_layout->addWidget(angleGauge->widget , 2 ,2);
     top_box->setLayout(top_layout);
     top_box->setTitle("Gauges");
     this->setCentralWidget(top_box );
+    this->setStatusBar(statusbar);
     this->show();
 
     // ******** For testing purpose ***************
@@ -30,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     while(1){
         dieTime = dieTime.addMSecs(16);
         while( QTime::currentTime() < dieTime )
-            QCoreApplication::processEvents( QEventLoop::AllEvents, 8);
+            QCoreApplication::processEvents( QEventLoop::AllEvents, 4);
 
 
         I.peak = fmodf(I.peak+0.1f , 25.0f);
