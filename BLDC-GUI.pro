@@ -28,13 +28,15 @@ SOURCES += \
     currentgague.cpp \
     qcgaugewidget.cpp \
     wait.cpp \
-    tempgauge.cpp
+    tempgauge.cpp \
+    QEgauge.cpp
 
 HEADERS += \
         mainwindow.h \
     currentgague.h \
     qcgaugewidget.h \
-    tempgauge.h
+    tempgauge.h \
+    QEgauge.h
 
 FORMS += \
         mainwindow.ui

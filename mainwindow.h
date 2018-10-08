@@ -5,6 +5,7 @@
 #include <QtWidgets>
 #include "currentgague.h"
 #include "tempgauge.h"
+#include "QEgauge.h"
 
 extern void wait( int millisecondsToWait );
 
@@ -26,6 +27,7 @@ private:
     QGroupBox* top_box;
     currentGague* currentGauge;
     tempgauge* tempGauge;
+    QEgauge* angleGauge;
 
 };
 
