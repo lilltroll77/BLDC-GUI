@@ -30,7 +30,8 @@ SOURCES += \
     wait.cpp \
     tempgauge.cpp \
     QEgauge.cpp \
-    tachometer.cpp
+    tachometer.cpp \
+    menu.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -38,7 +39,8 @@ HEADERS += \
     qcgaugewidget.h \
     tempgauge.h \
     QEgauge.h \
-    tachometer.h
+    tachometer.h \
+    menu.h
 
 FORMS += \
         mainwindow.ui

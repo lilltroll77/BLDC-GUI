@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tachometerGauge = new tachometer(this);
 
     statusbar = new QStatusBar(this);
+    menuBar = new menu(this);
     statusbar->showMessage("Serial: Not connected");
     top_layout->addWidget(currentGauge->widget , 1,1);
     top_layout->addWidget(tempGauge->widget , 2,1);
@@ -25,6 +26,7 @@ MainWindow::MainWindow(QWidget *parent) :
     top_box->setTitle("Gauges");
     this->setCentralWidget(top_box );
     this->setStatusBar(statusbar);
+    this->setMenuBar(menuBar->bar);
     this->show();
 
     // ******** For testing purpose ***************
