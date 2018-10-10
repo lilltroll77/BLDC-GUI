@@ -1,11 +1,16 @@
 #include "menu.h"
 #include <QDebug>
+#include <QList>
+#include <QtWidgets>
+#include "serial_com.h"
+
+extern QSerialPort serial;
 
 menu::menu(QWidget *parent) : QWidget(parent)
 {
     mainWindow = parent;
-    bar = new QMenuBar(parent);
 
+    bar = new QMenuBar(parent);
     File = new QMenu("File", parent);
     Settings = new QMenu("Settings" , parent);
     Help = new QMenu("Help" , parent);
@@ -23,7 +28,9 @@ menu::menu(QWidget *parent) : QWidget(parent)
     connect(action.file.Exit , SIGNAL(triggered()) , this , SLOT(slot_exit()));
     File->addAction(action.file.Exit);
 
-    Settings->setEnabled(false);
+    action.settings.serial = new QAction("Serial port");
+    connect(action.settings.serial , SIGNAL(triggered()) , this , SLOT(slot_serialPort()));
+    Settings->addAction(action.settings.serial);
 
     action.help.About = new QAction("About");
     connect(action.help.About , SIGNAL(triggered()) , this , SLOT(slot_about()));
@@ -36,6 +43,8 @@ menu::menu(QWidget *parent) : QWidget(parent)
     bar->addMenu(Help);
 
 
+
+
 }
 
 void menu::slot_about(){
@@ -46,6 +55,38 @@ void menu::slot_about(){
     msgBox.setText(str);
     //msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Discard);
     msgBox.exec();
+}
+
+void menu::slot_serialPort(){
+    QSerialPortInfo info;
+    ports =info.availablePorts();
+    msg.setWindowTitle("Set COM port");
+
+    for(int i=0; i<ports.length() ; i++)
+        comboBox.addItem(ports[i].portName());
+    QVBoxLayout layout;
+    QLabel label;
+    QPushButton button;
+    button.setMaximumWidth(60);
+    button.setText("OK");
+    label.setText("Choose XMOS virtual COM port");
+    layout.addWidget(&label);
+    layout.addWidget(&comboBox);
+    layout.addWidget(&button);
+    msg.setLayout(&layout);
+    msg.setMinimumWidth(200);
+    comboBox.setMaximumWidth(120);
+    msg.setMinimumHeight(100);
+    connect(&button , SIGNAL(released()) , this , SLOT(slot_setPort()));
+    msg.exec();
+
+
+}
+
+void menu::slot_setPort(){
+    msg.close();
+    int i = comboBox.currentIndex();
+    emit COMportSelected(ports[i]);
 }
 
 void menu::slot_exit(){

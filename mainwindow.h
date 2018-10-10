@@ -8,6 +8,8 @@
 #include "QEgauge.h"
 #include "tachometer.h"
 #include "menu.h"
+#include "serial_com.h"
+
 
 extern void wait( int millisecondsToWait );
 
@@ -22,17 +24,23 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    currentGague* currentGauge;
+
+private slots:
+    void openCOMport(QSerialPortInfo portInfo);
+    void readCOMdata();
+    void COMError(QSerialPort::SerialPortError error);
 
 private:
     Ui::MainWindow *ui;
     QGridLayout* top_layout;
     QGroupBox* top_box;
-    currentGague* currentGauge;
     tempgauge* tempGauge;
     QEgauge* angleGauge;
     tachometer* tachometerGauge;
     QStatusBar* statusbar;
     menu* menuBar;
+    QSerialPort serial;
 
 };
 

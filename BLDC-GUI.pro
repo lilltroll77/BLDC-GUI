@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets
+QT       += core gui widgets serialport
 
 TARGET = BLDC-GUI
 TEMPLATE = app
@@ -31,7 +31,8 @@ SOURCES += \
     tempgauge.cpp \
     QEgauge.cpp \
     tachometer.cpp \
-    menu.cpp
+    menu.cpp \
+    serial_com.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -40,7 +41,8 @@ HEADERS += \
     tempgauge.h \
     QEgauge.h \
     tachometer.h \
-    menu.h
+    menu.h \
+    serial_com.h
 
 FORMS += \
         mainwindow.ui
