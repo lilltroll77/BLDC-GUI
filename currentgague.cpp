@@ -68,7 +68,7 @@ currentGague::currentGague(QWidget *parent , float imax) : QWidget(parent)
         Values->setMinValue(0);
         Values->setMaxValue(Imax);
         setScale(Imax);
-
+        widget->update();
 }
 
 void currentGague::setScale(float I){

@@ -13,6 +13,8 @@
 
 extern void wait( int millisecondsToWait );
 
+enum status_event{connected , disconnected};
+
 namespace Ui {
 class MainWindow;
 }
@@ -26,10 +28,14 @@ public:
     ~MainWindow();
     currentGague* currentGauge;
 
+public slots:
+     void updateStatusBar(enum status_event event);
+
 private slots:
     void openCOMport(QSerialPortInfo portInfo);
     void readCOMdata();
     void COMError(QSerialPort::SerialPortError error);
+
 
 private:
     Ui::MainWindow *ui;
@@ -40,7 +46,8 @@ private:
     tachometer* tachometerGauge;
     QStatusBar* statusbar;
     menu* menuBar;
-    QSerialPort serial;
+    QSerialPort* serial;
+    int link_up=false;
 
 };
 

@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    serial = new QSerialPort(this);
     setWindowTitle("FOC & SVPWM for BLDC with XMOS");
     top_layout = new QGridLayout(this);
     top_box = new QGroupBox(this);
@@ -17,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     statusbar = new QStatusBar(this);
     menuBar = new menu(this);
-    statusbar->showMessage("Serial: Not connected");
+    updateStatusBar(disconnected);
     top_layout->addWidget(currentGauge->widget , 1,1);
     top_layout->addWidget(tempGauge->widget , 2,1);
     top_layout->addWidget(tachometerGauge->widget , 1, 2);
@@ -30,17 +31,16 @@ MainWindow::MainWindow(QWidget *parent) :
     this->show();
 
     connect(menuBar , SIGNAL(COMportSelected(QSerialPortInfo)) , this , SLOT(openCOMport(QSerialPortInfo)));
- /// ERROR in signal   connect(&serial  , SIGNAL(errorOccurred(SerialPortError)) , this , SLOT(COMError(QSerialPort::SerialPortError)));
+
     // ******** For testing purpose ***************
 
     struct I_t I ={1.0f , 0.0f};
     float T=0 , deg=0 , RPM=0;
 
-    QTime dieTime = QTime::currentTime().currentTime();
+
+/*
     while(1){
-        dieTime = dieTime.addMSecs(16);
-        while( QTime::currentTime() < dieTime )
-            QCoreApplication::processEvents( QEventLoop::AllEvents, 4);
+        wait(16);
         tempGauge->setTemp(T+20.0f);
         angleGauge->setAngle(deg);
         currentGauge->setCurrent(&I);
@@ -51,32 +51,45 @@ MainWindow::MainWindow(QWidget *parent) :
         T = fmodf(T+0.25f , 100.0f);
         RPM = fmodf(RPM+5 , 3000.0f);
         deg = fmodf(deg+ 1.0f , 360.0f);
-        readCOMdata();
+        //readCOMdata();
 
     }
-
+ */
 }
+
 
 MainWindow::~MainWindow()
 {
-    serial.close();
+    writeSerialCommand(CLOSE_LINK , serial);
+    serial->waitForBytesWritten();
+    serial->close();
     delete ui;
 
 }
 
 void MainWindow::openCOMport(QSerialPortInfo portInfo){
-    if(!serial.isOpen()){
-        serial.setPort(portInfo);
+    if(!serial->isOpen()){
+        serial->setPort(portInfo);
         QErrorMessage msg;
         msg.setWindowTitle("COM port error");
-        if(!serial.open(QSerialPort::ReadWrite)){
+        if(!serial->open(QSerialPort::ReadWrite)){
             msg.showMessage("COM port could not open");
             msg.exec();
         }
         else{
-            serial.setReadBufferSize(512);
-            serial.flush();
-            writeSerialCommand(LINK_UP, &serial);
+            while(!serial->isOpen())
+                wait(1);
+            //serial->blockSignals(true);
+            serial->setReadBufferSize(512);
+            serial->clear(QSerialPort::AllDirections);
+            serial->clearError();
+            //serial->setBreakEnabled(false);
+            connect(serial , &QSerialPort::errorOccurred , this , &MainWindow::COMError);
+            connect(serial , &QSerialPort::readyRead , this , &MainWindow::readCOMdata );
+            //serial->blockSignals(false);
+            writeSerialUint(LINK_VER, magicID , serial);
+            qDebug() << "Link ver. command sent";
+            //readCOMdata();
         }
 
     }
@@ -89,24 +102,65 @@ void MainWindow::openCOMport(QSerialPortInfo portInfo){
 }
 
 void MainWindow::readCOMdata(){
+    if(!serial->isOpen())
+         return;
+    enum BYTES{LENGTH , COMMAND , DATATYPE , CHECKSUM};
     char serial_data[512];
     I_t* I;
-    //qDebug() <<serial.bytesAvailable();
-    while((serial.bytesAvailable()>SERIAL_HEADER_SIZE) && (serial.isOpen())){
-        serial.read(serial_data , SERIAL_HEADER_SIZE);
-        int len = serial_data[0] - SERIAL_HEADER_SIZE;
-        qDebug() <<len;
-        int command = serial_data[1];
+
+    qint64 bytes = serial->bytesAvailable();
+    if(bytes > 0){
+        qDebug() <<"Bytes:" <<bytes;
+    }
+    while( bytes >= SERIAL_HEADER_SIZE){
+        if(serial->read(serial_data , SERIAL_HEADER_SIZE)!=SERIAL_HEADER_SIZE)
+            qDebug() <<"Header read error";
+        int len = serial_data[LENGTH] - SERIAL_HEADER_SIZE;
+        int command = serial_data[COMMAND];
+        qDebug()<< "Recieved: Package len"<<len << "COM:"<<command;
         float* float_vec;
+        unsigned* u32_data;
         if(len>0){
-            while( serial.bytesAvailable() < len)
+            while( serial->bytesAvailable() < len)
                 wait(1);
-            serial.read(serial_data , len);
+            if(serial->read(serial_data , len) != len)
+                qDebug() << "Header read error";
             float_vec = reinterpret_cast<float*>(serial_data);
             I =         reinterpret_cast<struct I_t*>(serial_data);
+            u32_data = reinterpret_cast<unsigned*>(serial_data);
         }
 
+        /// ADD SCHECKSUM!
+
         switch(command){
+        case(CLOSE_LINK):{
+            serial->close();
+            updateStatusBar(disconnected);
+            break;
+        }
+        case(OPEN_LINK):{
+            updateStatusBar(connected);
+            break;
+        }
+        case(LINK_VER):{
+            if(link_version == *u32_data){
+                qDebug() << "Open link command sent";
+                writeSerialCommand(OPEN_LINK , serial);
+                link_up=true;
+                updateStatusBar(connected);
+            }else{
+                QString str;
+                if(link_version > *u32_data)
+                    str = "GUI code version is newer than XMOS code version. Update XMOS code!";
+                else
+                    str = "GUI code version is older than XMOS code version. Update GUI code!";
+                QErrorMessage msg;
+                msg.showMessage(str);
+                msg.setWindowTitle("Error");
+                msg.exec();
+            }
+            break;
+        }
         case(COM_CURRENT):{
             currentGauge->setCurrent(I);
             break;
@@ -115,28 +169,61 @@ void MainWindow::readCOMdata(){
             qDebug()<<"Unknown COM command";
             break;
         }//switch
-    }
+    bytes = serial->bytesAvailable();
+    }// while
 }
 
 void MainWindow::COMError(QSerialPort::SerialPortError error){
     QString str;
     switch(error){
+    case QSerialPort::NoError:
+        return;
     case QSerialPort::DeviceNotFoundError:
-        str.append("An error occurred while attempting to open an non-existing device.");
+        str="An error occurred while attempting to open an non-existing device.";
         break;
     case QSerialPort::PermissionError:
-        str.append("An error occurred while attempting to open an already opened device by another process or a user not having enough permission and credentials to open.");
+        str="An error occurred while attempting to open an already opened device by another process or a user not having enough permission and credentials to open.";
         break;
     case QSerialPort::OpenError:
-        str.append("An error occurred while attempting to open an already opened device in this object.");
+        str="An error occurred while attempting to open an already opened device in this object.";
         break;
+    case QSerialPort::WriteError:
+        str = "Write error";
+        break;
+    case QSerialPort::ReadError:
+         str = "Read error";
+        break;
+    case QSerialPort::ResourceError:
+         str = "An I/O error occurred when a resource becomes unavailable, e.g. when the device is unexpectedly removed from the system.";
+        break;
+    case QSerialPort::TimeoutError:
+         str = "A timeout error occurred";
     default:
-        str.append("Read the Qt manual :) @ enum QSerialPort::SerialPortError");
+        str.sprintf("Error %d: Read the Qt manual :) @ enum QSerialPort::SerialPortError" , error);
         break;
     }
+    serial->clearError();
     QErrorMessage msg;
     msg.showMessage(str);
     msg.setWindowTitle("COM port error");
     msg.exec();
 
+
+}
+
+void MainWindow::updateStatusBar(enum status_event event){
+    switch(event){
+    case connected:{
+        statusbar->showMessage("CONNECTED TO XMOS", 0);
+        statusbar->setStyleSheet("color:green");
+        break;
+    }
+    case disconnected:{
+        statusbar->showMessage("NOT CONNECTED" , 0);
+        statusbar->setStyleSheet("color:red");
+        statusbar->show();
+        break;
+    }
+    }
+    statusbar->show();
 }

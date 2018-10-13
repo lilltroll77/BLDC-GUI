@@ -4,8 +4,14 @@
 #include "currentgague.h"
 
 #define SERIAL_HEADER_SIZE 4
-enum COMMAND{LINK_DOWN,
-             LINK_UP ,
+
+const int link_version=1;
+const unsigned magicID= 3141592654;
+
+enum COM_COMMAND{
+             CLOSE_LINK ,
+             OPEN_LINK  ,
+             LINK_VER ,
              COM_CURRENT ,
              COM_STOP,
              COM_DRV,
@@ -28,7 +34,10 @@ enum COMMAND{LINK_DOWN,
              COM_PI_TORQUE_FREQ ,
              COM_PI_TORQUE_GAIN ,
              COM_PI_FLUX_FREQ ,
-             COM_PI_FLUX_GAIN
+             COM_PI_FLUX_GAIN ,
+             TIME_OUT,
+             CSERROR,
+             SKIP
             };
 void writeSerialCommand(char ID , QSerialPort* serial);
 void writeSerialUint(char ID , unsigned value , QSerialPort* serial);
